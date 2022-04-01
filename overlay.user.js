@@ -5,7 +5,9 @@
 // @description  the sus corner can't withstand us
 // @author       /u/irate_kalypso, modified for Elkia by Cerx
 // @match        https://hot-potato.reddit.com/embed*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=reddit.com
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=elkia.club
+// @updateURL    https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
+// @downloadURL  https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
 // @grant        none
 // ==/UserScript==
 if (window.top !== window.self) {
@@ -18,7 +20,5 @@ if (window.top !== window.self) {
                 console.log(i);
                 return i;
             })())
-
     }, false);
-
 }

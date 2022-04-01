@@ -16,7 +16,7 @@ if (window.top !== window.self) {
             (function () {
                 const i = document.createElement("img");
                 i.src = "https://imgur.com/x1bmz7p.png";
-                i.style = "position: absolute;left: 0;top: 0;image-rendering: pixelated;width: 1000px;height: 1000px;";
+                i.style = "position: absolute;left: 0;top: 0;image-rendering: pixelated;width: 1000px;height: 1000px; opacity: .75;";
                 console.log(i);
                 return i;
             })())

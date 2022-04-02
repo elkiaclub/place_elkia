@@ -81,56 +81,65 @@
 
     // this code doesn't look pretty, but it works
     async function runScript(theCanvas) {
-        console.log("Placing Elkia");
+        console.log("Placing");
         const place = getPlaceApi(theCanvas);
         const instructions = await getInstructionsApi();
         const { width, height, pixelColor } = instructions;
 
-        setTimeout(async () => {
-            // get a random pixel from the placement
-            // if the color on canvas does not match the color of the blueprint, we have found a location to place a piece
+        // get a random pixel from the placement
+        async function findPlaceToColor() {
             let pos = {}
-            do {
+            // selects a random pixel within the placement
+            while(true) {
                 const x = Math.floor(Math.random() * width)
                 const y = Math.floor(Math.random() * height)
-                pos = { x, y, color: getColorID(pixelColor(x, y))}
-                await sleep(100); // makes sure this does not crash when the canvas is exactly the same as the blueprint
-            } while (getColorID(place.getPixel(pos.x + placementLocation.x, pos.y + placementLocation.y)) === pos.color)
-            console.log(`Found a place to place - color ${pos.color} at ${pos.x + placementLocation.x}, ${pos.y + placementLocation.y}`);
+                pos = { x, y, color: convertPalette(pixelColor(x, y))}
+                const canvasColor = place.getPixel(pos.x + placementLocation.x, pos.y + placementLocation.y)
+                // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
+                if (canvasColor !== pos.color) {
+                    console.log(`Found a location to place - color ${pos.color} at ${pos.x + placementLocation.x}, ${pos.y + placementLocation.y}`);
+                    return pos;
+                }
+                // if the colors match, waits a bit and tries again
+                await sleep(200); // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
+            }
+        }
+
+        const update = async () => {
+            console.log("Updating");
+            const pos = await findPlaceToColor();
             await place.setPixel(pos.x + placementLocation.x, pos.y + placementLocation.y, pos.color)
-            // wait 5 minutes and 30 seconds before trying again
             await sleep(5.5 * 60 * 1000)
-        }, 5000);
+            update();
+        }
+        // start the update loop
+        setTimeout(update, 1000);
     }
 
-    // maps the color of the pixel to colorMap
-    function getColorID(pixelColor) {
+    // maps the image colors to colorMap
+    function convertPalette(pixelColor) {
         // the simplest is to take the euclidian distance between the two points in RGB space
         const getDistance = (color1, color2) => {
+            const c1 = hexToRgb(color1)
+            const c2 = hexToRgb(color2)
             const distance = Math.sqrt(
-                Math.pow(color1.r - color2.r, 2) +
-                Math.pow(color1.g - color2.g, 2) +
-                Math.pow(color1.b - color2.b, 2)
+                Math.pow(c1.r - c2.r, 2) +
+                Math.pow(c1.g - c2.g, 2) +
+                Math.pow(c1.b - c2.b, 2)
             );
             return distance;
         }
 
-        // if the color is not in the map, return the closest color
-        if (colorMap.has(pixelColor)) {
-            return colorMap.get(pixelColor);
-        } else {
-            // get the closest color
-            const availableColors = colorMap.keys()
-            const closestColor = availableColors.reduce((prev, curr) => {
-                const distance = getDistance(hexToRgb(pixelColor), curr);
-                if (distance < getDistance(hexToRgb(pixelColor), prev)) {
-                    return curr;
-                } else {
-                    return prev;
-                }
-            });
-            return colorMap.get(closestColor);
-        }
+        const availableColors = Array.from(colorMap.keys())
+        const closestColor = availableColors.reduce((prev, curr) => {
+            const distance = getDistance(pixelColor, curr);
+            if (distance < getDistance(pixelColor, prev)) {
+                return curr;
+            } else {
+                return prev;
+            }
+        });
+        return colorMap.get(closestColor);
     }
 
     // waits for the canvas to be loaded

@@ -6,6 +6,8 @@
 // @description  the sus corner can't withstand us
 // @author       Cerx
 // @match        https://hot-potato.reddit.com/embed*
+// @updateURL    https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
+// @downloadURL  https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
 // ==/UserScript==
 
 // author's note: the code is bad and not optimized

@@ -88,14 +88,14 @@
     let updateCount = 0
     const update = async () => {
       const cooldown = checkCooldown()
-      if (cooldown) {
+      if (!!cooldown) {
         ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
 
         setTimeout(() => {
           update()
-        }, 1000 * cooldown + 100) // wait for cooldown to end + 1 second
+        }, 1000 * cooldown + 1000) // wait for cooldown to end + 1 second
 
-        if(cooldown > 5){ // if cooldown more than 1 second, clear the overlay
+        if(cooldown > 5){ // clear the overlay
           await sleep(5000)
           ui.emptyContainer()
         }

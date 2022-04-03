@@ -64,14 +64,14 @@
       while (true) {
         const x = Math.floor(Math.random() * instructions.image.width)
         const y = Math.floor(Math.random() * instructions.image.height)
-        ui.displayText(`Checking ${x + placementLocation.x},${y + placementLocation.y}...`)
+        ui.displayText(`checking... (${x + placementLocation.x},${y + placementLocation.y})`)
         const blueprintColor = instructions.pixelColor(x, y)
         if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
           const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
           const canvasColor = place.getPixel(x + placementLocation.x, y + placementLocation.y)
           // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
           if (canvasColor !== targetColor) {
-            ui.displayText(`tile: ${canvasColor} at location x:${x + placementLocation.x} y:${y + placementLocation.y} is not matching the blueprint color: ${targetColor} `)
+            ui.displayText(`tile: ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y}) is not matching the blueprint: ${targetColor} (${x}, ${y}) `)
             return {
               x: x + placementLocation.x,
               y: y + placementLocation.y,
@@ -88,17 +88,23 @@
 
     let updateCount = 0
     const update = async () => {
-      const pos = await findPlaceToColor()
-      await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
-      ui.displayText(`placed tile: ${pos.color} at x:${pos.x + placementLocation.x} y:${pos.y + placementLocation.y}`)
-      await sleep(5.5 * 60 * 1000) // wait 5.5 minutes
-
-      // refresh page after a bit for good measure
+      // refreshes the page every 10 cycles for good measure
       updateCount++
       if (updateCount >= 10) {
         console.log('Reloading page...')
         location.reload()
+        return
       }
+
+      // get a random pixel to color
+      const pos = await findPlaceToColor()
+      await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
+      ui.displayText(`placed tile: ${pos.color} (${pos.x + placementLocation.x}, ${pos.y + placementLocation.y})`)
+
+      // wait 5.5 minutes before trying again
+      await sleep(.1 * 60 * 1000)
+      ui.emptyContainer() // clear the text
+      await sleep(5.4 * 60 * 1000)
       update()
     }
     // start the update loop
@@ -144,7 +150,7 @@
 
     parseColors(str) {
       const matchHex  = /(#?([a-f\d]{6}))/gi
-      return str.replace(matchHex, (s, g0, g1) =>  `<div style="background: ${g0}; width: 10px; height: 10px; margin: 5px"></div>`)
+      return str.replace(matchHex, (s, g0, g1) =>  `<div style="background: ${g0}; width: 10px; height: 10px; margin: 5px; border: 1px solid rgba(255,255,255,.5)"></div>`)
     }
 
     displayText (text) {
@@ -238,7 +244,7 @@
     async setPixel (x, y, colorId) {
       this.canvas.dispatchEvent(createEvent('click-canvas', { x, y }))
       await sleep(1000)
-      this.canvas.dispatchEvent(createEvent('select-color', { colorId }))
+      this.canvas.dispatchEvent(createEvent('select-color', { color: colorId }))
       await sleep(1000)
       this.canvas.dispatchEvent(createEvent('confirm-pixel'))
     }

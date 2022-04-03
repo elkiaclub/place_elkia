@@ -61,7 +61,7 @@
       while (true) {
         const x = Math.floor(Math.random() * instructions.image.width)
         const y = Math.floor(Math.random() * instructions.image.height)
-        ui.displayText(`checking... (${x + placementLocation.x},${y + placementLocation.y})`)
+        ui.displayText(`checking... (${x + placementLocation.x}, ${y + placementLocation.y})`)
         const blueprintColor = instructions.pixelColor(x, y)
         if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
           const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?

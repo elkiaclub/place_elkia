@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Place ccKufi
+// @name         Place Garfield
 // @version      0.4
 // @description  cc+ak+nn
 // @author       Cerx

@@ -1,9 +1,13 @@
 // ==UserScript==
-// @name         Place ccKufi
+// @name         Place Elkia
+// @namespace    https://elkia.club/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=elkia.club
 // @version      0.4
-// @description  cc+ak+nn
+// @description  the sus corner can't withstand us
 // @author       Cerx
 // @match        https://hot-potato.reddit.com/embed*
+// @updateURL    https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
+// @downloadURL  https://github.com/elkiaclub/place_elkia/raw/master/overlay.user.js
 // ==/UserScript==
 
 // author's note: the code is not very optimized
@@ -11,10 +15,10 @@
 (function () {
   'use strict'
   // image stored as base64 to prevent CORS issues
-  const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAAYCAMAAACCyC6UAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAwUExURQAAAP+oADaQ6n7tVv////+ZqoEen9TX2b4AOYmNkP9FAACjaLRKwCRQpFHp9AAAAEz7NRMAAAAQdFJOU////////////////////wDgI10ZAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABUElEQVQ4T5WSCXaDMAxEBSjg0EDvf9vOItbX9KVjIxsxH9mG+D4ruuj7iGEYIiIj3bem26TN7hIhNCn3roGAsrTZXQLEUqwkh5wGGJm5VeLrPxCdBqCIx1j5UuY0TRgbg6fT8wKBodGaZwQxtDaNveINOjEdBEguQi2zpzKf76AvCAMLtcalIYoiU5Cd59XxU6kQ3K0JIiXGkDfwkCJGnYUCN2BKEYdNpqBZEjRS8L9ephpNrvQWErMfu6xY3B8QKDMFyUj9DkU3c1vYEYBxEQJfJn1HqYLqj8BXQTkcNA9gMSSXrzsEpiBggAAYoolAMUoYUqEN6gQthsxwfcUwJciMPi7/Gv4GCyTDvnsBFiBEMYBEkSGF/NV7lRlCPMF/SmSs7rpWTDFRVB6tkhqR26B7215x3DK6G9JjZDXWc0Xltome6NohtcNaYyXqVn2NH55eG01k7u9eAAAAAElFTkSuQmCC'
+  const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAGBAMAAABQoYHsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURf+ZqjaQ6q4btl0AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAySURBVBjTZYzBEQAxAAFtB/TfbMjc68LH7ECPCLIdYQMFDIj6A3W0xgXexJs0Z/n3KB1RKgGzzZtijwAAAABJRU5ErkJggg=='
   const placementLocation = {
-    x: 755,
-    y: 661
+    x: 838,
+    y: 0
   }
 
   // stole the mappings from https://github.com/rdeepak2002/reddit-place-script-2022/blob/main/mappings.py

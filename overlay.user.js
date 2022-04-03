@@ -2,7 +2,7 @@
 // @name         Place Elkia
 // @namespace    https://elkia.club/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=elkia.club
-// @version      0.3
+// @version      0.4
 // @description  the sus corner can't withstand us
 // @author       Cerx
 // @match        https://hot-potato.reddit.com/embed*
@@ -17,8 +17,8 @@
     // image stored as base64 to prevent CORS issues
     const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAGBAMAAABQoYHsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURf+ZqjaQ6q4btl0AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAySURBVBjTZYzBEQAxAAFtB/TfbMjc68LH7ECPCLIdYQMFDIj6A3W0xgXexJs0Z/n3KB1RKgGzzZtijwAAAABJRU5ErkJggg=='
     const placementLocation = {
-        x: 1617,
-        y: 218
+        x: 838,
+        y: 0
     }
     // stole the mappings from https://github.com/rdeepak2002/reddit-place-script-2022/blob/main/mappings.py
     const colorMap = new Map([

@@ -264,7 +264,7 @@
       await sleep(1000)
       this.canvas.dispatchEvent(createEvent('select-color', { color: colorId }))
       await sleep(1000)
-      // this.canvas.dispatchEvent(createEvent('confirm-pixel'))
+      this.canvas.dispatchEvent(createEvent('confirm-pixel'))
     }
   }
 

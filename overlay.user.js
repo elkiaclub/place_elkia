@@ -91,14 +91,13 @@
       if (!!cooldown && cooldown > 0) {
         ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
 
-        setTimeout(() => {
-          update()
-        }, 1000 * cooldown + 1000) // wait for cooldown to end + 1 second
-
         if (cooldown > 5) { // clear the overlay
           await sleep(5000)
           ui.emptyContainer()
         }
+        // wait for cooldown to expire
+        await sleep(cooldown * 1000)
+
       } else {
         // refreshes the page every 10 cycles for good measure
         updateCount++
@@ -118,6 +117,7 @@
         ui.emptyContainer() // clear the text
         await sleep(5.4 * 60 * 1000)
       }
+      update()
     }
     // start the update loop
     setTimeout(update, 1000)

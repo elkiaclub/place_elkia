@@ -13,8 +13,8 @@
   // image stored as base64 to prevent CORS issues
   const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAIAAAB1kpiRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB2SURBVBhXPY7BDUIxDEPjhEpsx5kdGIQZmIARGIAJWIETI4AUG1eFbyXuU5I2xeV1khR/TQKTe8U7MnNV0f3keYJDKXwCCGm2j/eHqpK9eHPrd3spe05s7sD1cCMS0Zqj9OvO9CH/wWuivIIakmGIA9yJ5lLFF5gaPtZodsZgAAAAAElFTkSuQmCC'
   const placementLocation = {
-    x: 1551,
-    y: 250
+    x: 1544,
+    y: 1701,
   }
 
   // stole the mappings from https://github.com/rdeepak2002/reddit-place-script-2022/blob/main/mappings.py

@@ -53,6 +53,7 @@
   async function runScript (theCanvas) {
     // get shit ready
     console.log('Maintainer starting up...')
+
     const ui = new UserInterface()
     const place = new PlaceApi(theCanvas)
     const instructions = new Instructions()
@@ -84,31 +85,53 @@
       }
     }
 
-    // TODO: check the cooldown to see if we can place a piece
-
     let updateCount = 0
     const update = async () => {
-      // refreshes the page every 10 cycles for good measure
-      updateCount++
-      if (updateCount >= 10) {
-        console.log('Reloading page...')
-        location.reload()
-        return
+      const cooldown = checkCooldown()
+      if (cooldown) {
+        ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
+
+        setTimeout(() => {
+          update()
+        }, 1000 * cooldown + 100) // wait for cooldown to end + 1 second
+
+        if(cooldown > 5){ // if cooldown more than 1 second, clear the overlay
+          await sleep(5000)
+          ui.emptyContainer()
+        }
+      } else {
+        // refreshes the page every 10 cycles for good measure
+        updateCount++
+        if (updateCount >= 10) {
+          console.log('Reloading page...')
+          location.reload()
+          return
+        }
+
+        // get a random pixel to color
+        const pos = await findPlaceToColor()
+        await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
+        ui.displayText(`placed tile: ${pos.color} (${pos.x + placementLocation.x}, ${pos.y + placementLocation.y})`)
+
+        // wait 5.5 minutes before trying again
+        await sleep(0.1 * 60 * 1000)
+        ui.emptyContainer() // clear the text
+        await sleep(5.4 * 60 * 1000)
       }
-
-      // get a random pixel to color
-      const pos = await findPlaceToColor()
-      await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
-      ui.displayText(`placed tile: ${pos.color} (${pos.x + placementLocation.x}, ${pos.y + placementLocation.y})`)
-
-      // wait 5.5 minutes before trying again
-      await sleep(.1 * 60 * 1000)
-      ui.emptyContainer() // clear the text
-      await sleep(5.4 * 60 * 1000)
-      update()
     }
     // start the update loop
     setTimeout(update, 1000)
+  }
+
+  // checks the status (cooldown on tile placement)
+  function checkCooldown () {
+    const status = document.querySelector('mona-lisa-embed')?.shadowRoot?.querySelector('mona-lisa-status-pill')
+    if (status) {
+      // read the cooldown
+      return status?.getAttribute('next-tile-available-in')
+    } else {
+      return null
+    }
   }
 
   // waits for the canvas to be loaded
@@ -148,9 +171,9 @@
       this.container.style.cssText = 'display: flex; align-items: center; justify-content: center; position: absolute; bottom: 0; right: 0; top: 0; left: 0; width: 100%; height: 100%; z-index: 2147483647; background: rgba(0,0,0,.75);'
     }
 
-    parseColors(str) {
-      const matchHex  = /(#?([a-f\d]{6}))/gi
-      return str.replace(matchHex, (s, g0, g1) =>  `<div style="background: ${g0}; width: 10px; height: 10px; margin: 5px; border: 1px solid rgba(255,255,255,.5)"></div>`)
+    parseColors (str) {
+      const matchHex = /(#?([a-f\d]{6}))/gi
+      return str.replace(matchHex, (s, g0, g1) => `<div style="background: ${g0}; width: 10px; height: 10px; margin: 5px; border: 1px solid rgba(255,255,255,.5)"></div>`)
     }
 
     displayText (text) {

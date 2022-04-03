@@ -88,7 +88,7 @@
     let updateCount = 0
     const update = async () => {
       const cooldown = checkCooldown()
-      if (cooldown) {
+      if (!!cooldown && cooldown > 0) {
         ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
 
         setTimeout(() => {
@@ -126,12 +126,7 @@
   // checks the status (cooldown on tile placement)
   function checkCooldown () {
     const status = document.querySelector('mona-lisa-embed')?.shadowRoot?.querySelector('mona-lisa-status-pill')
-    if (status) {
-      // read the cooldown
-      return status?.getAttribute('next-tile-available-in')
-    } else {
-      return null
-    }
+    return 0 || parseInt(status?.getAttribute('next-tile-available-in'))
   }
 
   // waits for the canvas to be loaded
@@ -269,7 +264,7 @@
       await sleep(1000)
       this.canvas.dispatchEvent(createEvent('select-color', { color: colorId }))
       await sleep(1000)
-      this.canvas.dispatchEvent(createEvent('confirm-pixel'))
+      // this.canvas.dispatchEvent(createEvent('confirm-pixel'))
     }
   }
 

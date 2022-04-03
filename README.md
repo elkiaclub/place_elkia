@@ -5,4 +5,4 @@
 
 3- Open [r/place](https://www.reddit.com/r/place/) in your browser
 
-3- Profit
+4- Profit

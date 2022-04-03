@@ -88,14 +88,14 @@
     let updateCount = 0
     const update = async () => {
       const cooldown = checkCooldown()
-      if (!!cooldown) {
+      if (cooldown) {
         ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
 
         setTimeout(() => {
           update()
         }, 1000 * cooldown + 1000) // wait for cooldown to end + 1 second
 
-        if(cooldown > 5){ // clear the overlay
+        if (cooldown > 5) { // clear the overlay
           await sleep(5000)
           ui.emptyContainer()
         }
@@ -111,7 +111,7 @@
         // get a random pixel to color
         const pos = await findPlaceToColor()
         await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
-        ui.displayText(`placed tile: ${pos.color} (${pos.x + placementLocation.x}, ${pos.y + placementLocation.y})`)
+        ui.displayText(`placed tile: ${pos.color} (${pos.x}, ${pos.y})`)
 
         // wait 5.5 minutes before trying again
         await sleep(0.1 * 60 * 1000)

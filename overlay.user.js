@@ -2,7 +2,7 @@
 // @name         Place Elkia
 // @namespace    https://elkia.club/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=elkia.club
-// @version      0.4
+// @version      0.5
 // @description  the sus corner can't withstand us
 // @author       Cerx
 // @match        https://hot-potato.reddit.com/embed*
@@ -89,68 +89,84 @@
         // scans the placement from left to right
         let x = 0
         let y = 0
-        while (true) {
-          for (x = 0; x < instructions.image.width; x++) {
-            for (y = 0; y < instructions.image.height; y++) {
-              const blueprintColor = instructions.pixelColor(x, y)
-              if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
-                const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
-                const canvasColor = place.getPixel(x + placementLocation.x, y + placementLocation.y)
-                // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
-                ui.displayText(`scanning... ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y})`)
+        for (x = 0; x < instructions.image.width; x++) {
+          for (y = 0; y < instructions.image.height; y++) {
+            const blueprintColor = instructions.pixelColor(x, y)
+            if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
+              const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
+              const canvasColor = place.getPixel(x + placementLocation.x, y + placementLocation.y)
+              // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
+              ui.displayText(`scanning... ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y})`)
 
-                if (canvasColor !== targetColor) {
-                  ui.displayText(`tile: ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y}) is not matching the blueprint: ${targetColor} (${x}, ${y}) `)
-                  return {
-                    x: x + placementLocation.x,
-                    y: y + placementLocation.y,
-                    color: targetColor
-                  }
+              if (canvasColor !== targetColor) {
+                ui.displayText(`tile: ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y}) is not matching the blueprint: ${targetColor} (${x}, ${y}) `)
+                return {
+                  x: x + placementLocation.x,
+                  y: y + placementLocation.y,
+                  color: targetColor
                 }
-                // if all the colors match, waits a bit and tries again
-                await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
               }
-              x++
+              // if all the colors match, waits a bit and tries again
+              await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
             }
-            y++
+            x++
           }
+          y++
         }
-      }      // uses the scanning method
+      }
+      // uses the scanning method
       return leftToRight()
     }
 
     let updateCount = 0
     const update = async () => {
+      // refreshes the page every 3 cycles for good measure
+      updateCount++
+      if (updateCount >= 3) {
+        console.log('Reloading page...')
+        location.reload()
+        return
+      }
+
+      // waits out the delay before trying to place a piece
       const cooldown = checkCooldown()
       if (!!cooldown && cooldown > 0) {
         ui.displayText(`Cooldown detected. Next tile available in: ${cooldown} seconds.`)
-
-        if (cooldown > 5) { // clear the overlay
-          await sleep(5000)
-          ui.emptyContainer()
+        if (cooldown > 3) {
+          setTimeout(() => {
+            ui.emptyContainer()
+          }, 3000)
         }
-        // wait for cooldown to expire
+
         await sleep(cooldown * 1000)
-      } else {
-        // refreshes the page every 10 cycles for good measure
-        updateCount++
-        if (updateCount >= 10) {
-          console.log('Reloading page...')
-          location.reload()
-          return
+
+        const now = new Date()
+        const nextMinute = () => new Date(now.getTime() + (60 - now.getSeconds()) * 1000)
+        const then = nextMinute()
+        while (new Date() < then) {
+          ui.displayText(`Cooldown expired. ${60 - nextMinute().getSeconds()} seconds remaining.`)
+          await sleep(1000)
         }
-
-        // get a random pixel to color
-        const pos = await findPlaceToColor()
-        console.log(pos)
-        await place.setPixel(pos.x, pos.y, colorMap.get(pos.color))
-        ui.displayText(`placed tile: ${pos.color} (${pos.x}, ${pos.y})`)
-
-        // wait 5.5 minutes before trying again
-        await sleep(0.1 * 60 * 1000)
-        ui.emptyContainer() // clear the text
-        await sleep(5.4 * 60 * 1000)
       }
+
+      // Try to place a piece
+      let pos = null
+      do {
+        pos = await findPlaceToColor()
+        await place.selectPixel(pos.x, pos.y, colorMap.get(pos.color))
+        // wait 0 - 6 seconds before placing tile
+        await sleep(Math.floor(Math.random() * 6000))
+        if (place.getPixel(pos.x, pos.y) !== colorMap.get(pos.color)) {
+          place.placePixel()
+        } else {
+          pos = null
+        }
+      } while (!pos)
+
+      ui.displayText(`placed tile: ${pos.color} (${pos.x}, ${pos.y})`)
+      await sleep(3000)
+      ui.emptyContainer() // clear the text
+
       update()
     }
     // start the update loop
@@ -293,11 +309,14 @@
       return rgbToHex(data[0], data[1], data[2])
     }
 
-    async setPixel (x, y, colorId) {
+    async selectPixel (x, y, colorId) {
       this.canvas.dispatchEvent(createEvent('click-canvas', { x, y }))
       await sleep(1000)
       this.canvas.dispatchEvent(createEvent('select-color', { color: colorId }))
       await sleep(1000)
+    }
+
+    placePixel () {
       this.canvas.dispatchEvent(createEvent('confirm-pixel'))
     }
   }

@@ -87,35 +87,32 @@
       // }
       async function leftToRight () {
         // scans the placement from left to right
-        let x = 0
-        let y = 0
-        for (x = 0; x < instructions.image.width; x++) {
-          for (y = 0; y < instructions.image.height; y++) {
-            const blueprintColor = instructions.pixelColor(x, y)
-            if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
-              const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
-              const canvasColor = place.getPixel(x + placementLocation.x, y + placementLocation.y)
-              // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
-              ui.displayText(`scanning... ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y})`)
-
-              if (canvasColor !== targetColor) {
-                ui.displayText(`tile: ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y}) is not matching the blueprint: ${targetColor} (${x}, ${y}) `)
-                return {
-                  x: x + placementLocation.x,
-                  y: y + placementLocation.y,
-                  color: targetColor
+        while (true) {
+          for (let x = 0; x < instructions.image.width; x++) {
+            for (let y = 0; y < instructions.image.height; y++) {
+              const blueprintColor = instructions.pixelColor(x, y)
+              if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
+                const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
+                const canvasColor = place.getPixel(x + placementLocation.x, y + placementLocation.y)
+                ui.displayText(`scanning... ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y})`)
+                // if the color on the canvas does not match the color of the blueprint, we have found a location to place a piece
+                if (canvasColor !== targetColor) {
+                  ui.displayText(`tile: ${canvasColor} (${x + placementLocation.x}, ${y + placementLocation.y}) is not matching the blueprint: ${targetColor} (${x}, ${y}) `)
+                  return {
+                    x: x + placementLocation.x,
+                    y: y + placementLocation.y,
+                    color: targetColor
+                  }
                 }
+                // if all the colors match, waits a bit and tries again
+                await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
               }
-              // if all the colors match, waits a bit and tries again
-              await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
             }
-            x++
           }
-          y++
         }
       }
       // uses the scanning method
-      return leftToRight()
+      return await leftToRight()
     }
 
     let updateCount = 0
@@ -140,28 +137,34 @@
 
         await sleep(cooldown * 1000)
 
+        // get the number of seconds left to the next full minute
         const now = new Date()
-        const nextMinute = () => new Date(now.getTime() + (60 - now.getSeconds()) * 1000)
-        const then = nextMinute()
-        while (new Date() < then) {
-          ui.displayText(`Cooldown expired. ${60 - nextMinute().getSeconds()} seconds remaining.`)
+        let secondsLeft = 60 - now.getSeconds()
+        while (secondsLeft > 0) {
+          ui.displayText(`Cooldown expired. ${secondsLeft} seconds remaining to next placement.`)
           await sleep(1000)
+          secondsLeft--
         }
+        ui.emptyContainer()
       }
 
       // Try to place a piece
       let pos = null
-      do {
-        pos = await findPlaceToColor()
-        await place.selectPixel(pos.x, pos.y, colorMap.get(pos.color))
+      while (!pos) {
         // wait 0 - 6 seconds before placing tile
         await sleep(Math.floor(Math.random() * 6000))
+
+        pos = await findPlaceToColor()
+        console.log(pos)
+        ui.displayText(`trying to place: ${pos.color} (${pos.x}, ${pos.y})`)
+        await place.selectPixel(pos.x, pos.y, colorMap.get(pos.color))
+        // check if the option still exists
         if (place.getPixel(pos.x, pos.y) !== colorMap.get(pos.color)) {
           place.placePixel()
         } else {
           pos = null
         }
-      } while (!pos)
+      }
 
       ui.displayText(`placed tile: ${pos.color} (${pos.x}, ${pos.y})`)
       await sleep(3000)

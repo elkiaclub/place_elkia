@@ -15,7 +15,7 @@
 (function () {
   'use strict'
   // image stored as base64 to prevent CORS issues
-  const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAGBAMAAABQoYHsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURf+ZqjaQ6q4btl0AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAySURBVBjTZYzBEQAxAAFtB/TfbMjc68LH7ECPCLIdYQMFDIj6A3W0xgXexJs0Z/n3KB1RKgGzzZtijwAAAABJRU5ErkJggg=='
+  const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAGBAMAAABQoYHsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAADMwFlM4z0AAAAJcEhZcwAADsIAAA7CARUoSoAAAAAySURBVBjTZYzBEQAxAAFtB/TfbMjc68LH7ECPCLIdYQMFDIj6A3W0xgXexJs0Z/n3KB1RKgGzzZtijwAAAABJRU5ErkJggg=='
   const placementLocation = {
     x: 1787,
     y: 1554
@@ -151,13 +151,13 @@
       // Try to place a piece
       let pos = null
       while (!pos) {
+        pos = await findPlaceToColor()
+        ui.displayText(`trying to place: ${pos.color} (${pos.x}, ${pos.y})`)
+        await place.selectPixel(pos.x, pos.y, colorMap.get(pos.color))
+
         // wait 0 - 6 seconds before placing tile
         await sleep(Math.floor(Math.random() * 6000))
 
-        pos = await findPlaceToColor()
-        console.log(pos)
-        ui.displayText(`trying to place: ${pos.color} (${pos.x}, ${pos.y})`)
-        await place.selectPixel(pos.x, pos.y, colorMap.get(pos.color))
         // check if the option still exists
         if (place.getPixel(pos.x, pos.y) !== colorMap.get(pos.color)) {
           place.placePixel()

@@ -17,8 +17,8 @@
   // image stored as base64 to prevent CORS issues
   const blueprint = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAGBAMAAABQoYHsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAADMwFlM4z0AAAAJcEhZcwAADsIAAA7CARUoSoAAAAAySURBVBjTZYzBEQAxAAFtB/TfbMjc68LH7ECPCLIdYQMFDIj6A3W0xgXexJs0Z/n3KB1RKgGzzZtijwAAAABJRU5ErkJggg=='
   const placementLocation = {
-    x: 1787,
-    y: 1554
+    x: 530,
+    y: 1360
   }
 
   // stole the mappings from https://github.com/rdeepak2002/reddit-place-script-2022/blob/main/mappings.py
@@ -134,19 +134,18 @@
             ui.emptyContainer()
           }, 3000)
         }
-
         await sleep(cooldown * 1000)
-
-        // get the number of seconds left to the next full minute
-        const now = new Date()
-        let secondsLeft = 60 - now.getSeconds()
-        while (secondsLeft > 0) {
-          ui.displayText(`Cooldown expired. ${secondsLeft} seconds remaining to next placement.`)
-          await sleep(1000)
-          secondsLeft--
-        }
-        ui.emptyContainer()
       }
+
+      // get the number of seconds left to the next full minute
+      const now = new Date()
+      let secondsLeft = 60 - now.getSeconds()
+      while (secondsLeft > 0) {
+        ui.displayText(`${secondsLeft} seconds remaining to next placement.`)
+        await sleep(1000)
+        secondsLeft--
+      }
+      ui.emptyContainer()
 
       // Try to place a piece
       let pos = null

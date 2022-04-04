@@ -90,9 +90,8 @@
         let x = 0
         let y = 0
         while (true) {
-          while (x < instructions.image.width) {
-            while (y < instructions.image.height) {
-              ui.displayText(`scanning... (${x + placementLocation.x}, ${y + placementLocation.y})`)
+          for (x = 0; x < instructions.image.width; x++) {
+            for (y = 0; y < instructions.image.height; y++) {
               const blueprintColor = instructions.pixelColor(x, y)
               if (blueprintColor !== null) { // skip if the blueprint color is transparent for selected pixel
                 const targetColor = instructions.convertPalette(blueprintColor) // todo: precalculate this?
@@ -108,16 +107,15 @@
                     color: targetColor
                   }
                 }
+                // if all the colors match, waits a bit and tries again
+                await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
               }
-              // if the colors match, waits a bit and tries again
-              await sleep(200) // this also makes sure the code does not hang when the canvas is exactly the same as the blueprint
               x++
             }
             y++
           }
         }
-      }
-      // uses the scanning method
+      }      // uses the scanning method
       return leftToRight()
     }
 

@@ -159,7 +159,7 @@
         await sleep(Math.floor(Math.random() * 6000))
 
         // check if the option still exists
-        if (place.getPixel(pos.x, pos.y) !== colorMap.get(pos.color)) {
+        if (place.getPixel(pos.x, pos.y) !== pos.color) {
           place.placePixel()
         } else {
           pos = null
